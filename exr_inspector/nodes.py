@@ -3,11 +3,10 @@
 # MIT License - Copyright (c) 2026 David Borrull. See LICENSE.
 """The "EXR A/B Inspector" node. It only hands sources to the viewer: graph
 images are saved to temp as float32, paths are checked and passed through.
-Layer, input space and every viewer setting live in the browser."""
+Layer, input space and every view setting live in the viewer (node
+properties), so changing them never needs a new run."""
 
 import os
-
-SPACES = ["auto", "sRGB", "linear"]
 
 
 def make_node(inspector):
@@ -18,21 +17,18 @@ def make_node(inspector):
         OUTPUT_NODE = True
         DESCRIPTION = ("Float A/B viewer: wipe / blink / diff, exposure, channels, eyedropper "
                        "with raw values. A path (EXR, multilayer, any compression) overrides "
-                       "the image input on that side.")
+                       "the image input on that side and shows up without running the workflow.")
 
         @classmethod
         def INPUT_TYPES(cls):
             side = lambda s: {
+                "default": "",
                 "tooltip": "EXR or image path for %s. Relative paths are looked up in input/, "
                            "then output/. When set, it overrides image_%s." % (s.upper(), s)}
             return {
                 "required": {
-                    "path_a": ("STRING", dict(default="", **side("a"))),
-                    "path_b": ("STRING", dict(default="", **side("b"))),
-                    "layer_a": ("STRING", {"default": "", "tooltip": "Layer id (empty = main colour layer)."}),
-                    "layer_b": ("STRING", {"default": "", "tooltip": "Layer id (empty = main colour layer)."}),
-                    "space_a": (SPACES, {"default": "auto", "tooltip": "auto: EXR/HDR linear, graph images and 8-bit files sRGB."}),
-                    "space_b": (SPACES, {"default": "auto"}),
+                    "path_a": ("STRING", side("a")),
+                    "path_b": ("STRING", side("b")),
                 },
                 "optional": {
                     "image_a": ("IMAGE",),
@@ -40,18 +36,16 @@ def make_node(inspector):
                 },
             }
 
-        def inspect(self, path_a="", path_b="", layer_a="", layer_b="", space_a="auto",
-                    space_b="auto", image_a=None, image_b=None):
+        def inspect(self, path_a="", path_b="", image_a=None, image_b=None):
             sides = {}
-            for name, path, image, layer, space in (("a", path_a, image_a, layer_a, space_a),
-                                                    ("b", path_b, image_b, layer_b, space_b)):
+            for name, path, image in (("a", path_a, image_a), ("b", path_b, image_b)):
                 if path and path.strip():
                     src = "file:" + inspector.policy.resolve(path)
                 elif image is not None and len(image) > 0:
                     src = inspector.save_tensor(image)
                 else:
                     continue
-                sides[name] = {"src": src, "layer": layer, "space": space}
+                sides[name] = {"src": src}
             return {"ui": {"exr_inspector": [sides]}}
 
         @classmethod

@@ -3,22 +3,44 @@
 Float A/B viewer for ComfyUI, made by a VFX compositor for checking renders, AOVs and
 generated plates the way you would in a compositing viewer.
 
-> **Status: work in progress.** The backend (EXR reading, layers, routes, node) is done;
-> the WebGL viewer is next.
+> **Status: work in progress (v0.1).**
 
-## Planned v1
+## The node
 
-- Wipe and blink between A and B, synced zoom and pan.
-- Exposure in stops and gamma shared by A and B; R / G / B / A / luminance.
-- Eyedropper with the raw values of A, B and their difference at the same pixel.
-- Difference with gain, false colour, clipping warning.
-- Input space sRGB / linear and a simple view transform.
-- Data layers (depth, normals, position, vectors) shown with min/max remap and invert,
-  without view transform. The eyedropper always shows the real value.
+**EXR A/B Inspector** (`image/EXR Inspector`). Each side takes an `IMAGE` from the graph
+or a path. A path wins over the image and shows up at once, without running the workflow.
+
+- Wipe, blink and difference (with gain) between A and B; zoom and pan are shared.
+- Exposure in stops, gamma and saturation, shared by A and B; R / G / B / A / luminance.
+- Eyedropper: raw values of A, B and A−B at the same pixel. Ctrl+click reads the exact
+  float from the file, even when the browser holds a float16 proxy.
+- False colour (stops from 18% grey; heat map on data layers) and clipping zebras
+  (> 1 red, < 0 blue, NaN/inf magenta).
+- Per side: layer, input space (auto / sRGB / linear). View transform sRGB, gamma 2.2,
+  gamma 2.4 or raw.
+- Data layers (depth, normals, position, vectors...) skip the view transform and use a
+  min/max remap (auto ignores the depth background) with invert; exposure and gamma
+  apply after the remap, as in Nuke's viewer.
+- B either fits A's format or lines up pixel for pixel. Display window (grey) and data
+  window (blue) outlines.
+- Fullscreen button. All settings are saved with the workflow.
+
+| keys (pointer over the viewer) | |
+|---|---|
+| wheel / drag | zoom / move the wipe (pan in other modes) |
+| middle, Alt or Space + drag | pan |
+| double-click, F / 0 | fit / 100% |
+| Ctrl+click | exact values from the file |
+| 1 2 W K D | A, B, wipe, blink, diff |
+| R G B A Y | channel (again: RGB) |
+| [ ] / E | exposure −/+ 0.5 / reset exposure, gamma and saturation |
+| X / Z | false colour / clipping |
+
+`python tests/make_demo.py` writes two demo EXRs to `tests/_data/demo` to try it out.
 
 ## EXR support
 
-Files are decoded on the server with OpenImageIO and sent to the browser as float16,
+Files (EXR, and also HDR, TIFF, PNG, JPG, DPX...) are decoded on the server with OpenImageIO and sent to the browser as float16,
 one layer at a time:
 
 - every OpenEXR compression (NONE, RLE, ZIPS, ZIP, PIZ, PXR24, B44, B44A, DWAA, DWAB),
