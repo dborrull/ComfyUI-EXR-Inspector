@@ -241,13 +241,17 @@ class Inspector {
         for (const k of ["a", "b"]) sideBar.append(this._buildSide(k));
 
         this.viewport = el("div", { class: "exri-viewport" });
+        this.viewport.addEventListener("pointerdown", () => this.root.focus({ preventScroll: true }));
         this.labels = { a: el("div", { class: "exri-label a" }), b: el("div", { class: "exri-label b" }) };
         this.msg = el("div", { class: "exri-msg" });
         this.marker = el("div", { class: "exri-marker" });
         this.viewport.append(this.labels.a, this.labels.b, this.msg, this.marker);
         this.readout = el("div", { class: "exri-readout" });
 
-        this.root = el("div", { class: "exri-root", tabindex: 0 }, bar, sideBar, this.viewport, this.readout);
+        // data-capture-wheel: in Vue nodes mode the graph leaves the wheel to us while
+        // the focus is inside this element (pointerenter / pointerdown focus the root)
+        this.root = el("div", { class: "exri-root", tabindex: 0, "data-capture-wheel": "true" },
+            bar, sideBar, this.viewport, this.readout);
         this.root.addEventListener("keydown", (e) => this._key(e));
         this.root.addEventListener("keyup", (e) => { if (e.code === "Space") this.viewer._space = false; });
         this.root.addEventListener("pointerenter", () => {
