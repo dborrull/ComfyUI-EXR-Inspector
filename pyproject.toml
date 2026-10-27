@@ -1,14 +1,14 @@
 [project]
 name = "comfyui-exr-inspector"
-description = "Float A/B viewer for ComfyUI: wipe/blink, exposure, channels, eyedropper with raw values, diff, false color. Reads multilayer EXR (Nuke/Blender) on the server, every compression included."
+description = "Float A/B viewer for ComfyUI: wipe/blink, exposure, channels, eyedropper with raw values, diff, false color. Reads multilayer EXR (Nuke/Blender) on the server, every compression."
 version = "0.1.0"
 license = { file = "LICENSE" }
 dependencies = ["OpenImageIO>=3.0", "numpy"]
 
 [project.urls]
 Repository = "https://github.com/dborrull/ComfyUI-EXR-Inspector"
+"Bug Tracker" = "https://github.com/dborrull/ComfyUI-EXR-Inspector/issues"
 
 [tool.comfy]
-PublisherId = ""
+PublisherId = "dborrull"
 DisplayName = "EXR Inspector"
-Icon = ""
