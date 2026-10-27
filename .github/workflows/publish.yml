@@ -1,0 +1,27 @@
+name: Publish to Comfy registry
+
+# Publishes when the version in pyproject.toml changes on main, or by hand
+# (Actions > Publish to Comfy registry > Run workflow).
+# Needs the repository secret REGISTRY_ACCESS_TOKEN: an API key from
+# https://registry.comfy.org (your publisher > API keys).
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["pyproject.toml"]
+
+permissions:
+  issues: write
+
+jobs:
+  publish-node:
+    name: Publish custom node to registry
+    runs-on: ubuntu-latest
+    if: ${{ github.repository_owner == 'dborrull' }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Publish custom node
+        uses: Comfy-Org/publish-node-action@v1
+        with:
+          personal_access_token: ${{ secrets.REGISTRY_ACCESS_TOKEN }}

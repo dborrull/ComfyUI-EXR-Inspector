@@ -24,6 +24,20 @@ export function halfToFloat(h) {
     return s * 2 ** (e - 15) * (1 + f / 1024);
 }
 
+// Texture copy with ±inf as ±65504: linear filtering mixes inf texels with
+// zero weight (inf * 0 = NaN) on some GPUs. The CPU copy keeps the real inf.
+function finiteHalfs(data) {
+    let out = null;
+    for (let i = 0; i < data.length; i++) {
+        const h = data[i];
+        if ((h & 0x7fff) === 0x7c00) {
+            out ??= data.slice();
+            out[i] = h === 0x7c00 ? 0x7bff : 0xfbff;
+        }
+    }
+    return out || data;
+}
+
 // Payload from /exr_inspector/pixels: "EXRI", uint32 meta length, JSON, float16 pixels
 export function parsePixels(buffer) {
     const view = new DataView(buffer);
@@ -99,7 +113,7 @@ export class Viewer {
             this._initGL();
             for (const k of ["a", "b"]) {
                 if (keep[k]) keep[k].tex = this._makeTexture(keep[k].meta.width, keep[k].meta.height,
-                    keep[k].nch, keep[k].data);
+                    keep[k].nch, finiteHalfs(keep[k].data));
             }
             this.render();
         });
@@ -130,7 +144,7 @@ export class Viewer {
             const nch = meta.channels.length;
             this.sides[side] = {
                 meta, data, nch,
-                tex: this._makeTexture(meta.width, meta.height, nch, data),
+                tex: this._makeTexture(meta.width, meta.height, nch, finiteHalfs(data)),
                 kind: meta.kind, space: opts.space || "linear",
                 range: opts.range || meta.stats.auto_range, invert: !!opts.invert,
             };

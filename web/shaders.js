@@ -138,9 +138,15 @@ float zebra() {
     return mod(floor((gl_FragCoord.x + gl_FragCoord.y) / 6.0), 2.0);
 }
 
+float finite(float v) {
+    return isnan(v) ? 0.0 : clamp(v, -65504.0, 65504.0);
+}
+
 vec3 finish(vec3 c, int kind, bool bad) {
     // c: linear (colour, gain applied) or 0..1 (data / diff)
     if (bad && (uClip || uFalse)) return vec3(1.0, 0.0, 1.0);
+    // inf -> half max, NaN -> 0: pow() of inf is NaN on some GPUs
+    c = vec3(finite(c.r), finite(c.g), finite(c.b));
     if (uFalse) {
         if (kind == 1) return turbo(dot(c, vec3(1.0 / 3.0)));
         float l = dot(c, LUMA);
@@ -161,7 +167,8 @@ vec3 finish(vec3 c, int kind, bool bad) {
 }
 
 bool isBad(vec4 v) {
-    return any(isnan(v)) || any(isinf(v));
+    // inf arrives as ±65504 (half max), see finiteHalfs() in viewer.js
+    return any(isnan(v)) || any(greaterThanEqual(abs(v), vec4(65504.0)));
 }
 
 // One side as the viewer shows it; alpha = 0 outside its data window

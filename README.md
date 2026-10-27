@@ -5,6 +5,12 @@ generated plates the way you would in a compositing viewer.
 
 > **Status: work in progress (v0.1).**
 
+![EXR A/B Inspector node: wipe between two EXRs, with raw values under the cursor](docs/node.png)
+
+| Difference ×4, exact values on Ctrl+click | False colour (stops from 18% grey) | Data layers: normals vs depth |
+|---|---|---|
+| ![Difference mode](docs/diff.png) | ![False colour](docs/falsecolor.png) | ![Normals and depth layers](docs/data_layers.png) |
+
 ## The node
 
 **EXR A/B Inspector** (`image/EXR Inspector`). Each side takes an `IMAGE` from the graph
