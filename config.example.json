@@ -1,0 +1,6 @@
+{
+  "allow_any_path": false,
+  "extra_roots": [],
+  "cache_mb": 2048,
+  "max_texture": 4096
+}

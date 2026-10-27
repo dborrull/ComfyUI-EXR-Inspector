@@ -1,0 +1,2 @@
+OpenImageIO>=3.0
+numpy
