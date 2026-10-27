@@ -19,7 +19,7 @@ from .exr_inspector import nodes, routes
 from .exr_inspector.paths import PathPolicy, load_config
 from .exr_inspector.service import Inspector
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _config = load_config(_HERE)

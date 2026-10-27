@@ -1,9 +1,18 @@
 # ComfyUI-EXR-Inspector
 
-Float A/B viewer for ComfyUI, made by a VFX compositor for checking renders, AOVs and
-generated plates the way you would in a compositing viewer.
+**EXR inspection and A/B QC for renders and AOVs, inside ComfyUI.** Made by a VFX
+compositor to check heavy multilayer EXRs the way you would in a compositing viewer:
+wipe a render against another (or against what your workflow generated), read the
+exact float under the cursor, look at depth, normals and vectors as data.
 
-> **Status: work in progress (v0.1).**
+What it is good at: big multilayer files (decoded on the server, one layer at a time,
+any compression), overscan, data passes and exact values. What it is not: a general
+viewer panel. If you want Nuke-style buffers, video playback and a gallery, look at
+[ComfyUI-NukeViewer](https://github.com/maxsarlijagit/ComfyUI-NukeViewer) or the viewer
+in [Radiance](https://github.com/fxtd-studios/radiance).
+
+> **Status: early release (v0.1).** Bugs and requests:
+> [issues](https://github.com/dborrull/ComfyUI-EXR-Inspector/issues).
 
 ![EXR A/B Inspector node: wipe between two EXRs, with raw values under the cursor](docs/node.png)
 
@@ -60,7 +69,14 @@ Deep EXR, full OCIO, sequences and Cryptomatte decoding are out of scope for v1.
 
 ## Install
 
-Clone into `ComfyUI/custom_nodes` and install the requirements with ComfyUI's Python:
+From ComfyUI-Manager: search for **EXR Inspector**. Or with comfy-cli:
+
+```
+comfy node install comfyui-exr-inspector
+```
+
+By hand: clone into `ComfyUI/custom_nodes` and install the requirements with ComfyUI's
+Python (`python_embeded\python.exe` on the Windows portable build):
 
 ```
 python -m pip install -r requirements.txt
